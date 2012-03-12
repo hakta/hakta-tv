@@ -3,35 +3,61 @@
 <head>
     <title>Tv demo</title>
     <meta name="description" content="">
-    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
+    <script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+    <script src="static/js/socket.io.js"></script>
 </head>
 <body>    
     <video id="videoPlayer" class="player" width="100%" height="100%">
-        <source id="videoSource" src="static/big_buck_bunny_640x360_2.28.mp4" type="video/mp4"/>
+        <source id="videoSource" src="" type="video/webm"/>
     </video>
-
     <script type="text/javascript">
-        var videoSourceList = [
-            "static/big_buck_bunny_640x360_2.28.mp4", 
-            "static/sintel_640x360_2.28.mp4",
-            "static/elephants_dream_640x360_2.30.mp4"
-        ];
-
-        var currentVideo = 0;
-        var videoPlayer = document.getElementById('videoPlayer');
-        var videoSource = document.getElementById('videoSource');
-        videoPlayer.play();
-
-        videoPlayer.onended = function(){
-            if (currentVideo == videoSourceList.length-1){
-                currentVideo = 0;
-            } else {
-                currentVideo += 1;
+        jQuery.fn.compare = function(t) {
+            if (this.length != t.length) { return false; }
+                var a = this.sort(),
+                b = t.sort();
+                for (var i = 0; t[i]; i++) {
+                if (a[i] !== b[i]) { 
+                    return false;
+                }
             }
-            videoSource.src = videoSourceList[currentVideo];
-            videoPlayer.load();
-            videoPlayer.play();
+            return true;
+        };
+
+        var playList;
+        
+        function play(){
+            player = $('#videoPlayer')[0];
+            source = $('#videoSource')[0];    
+
+            source.src = playList[0];
+            player.load();
+            player.play();
+
+            player.onended = function(){
+                console.log(source.src);
+                var current = playList.indexOf(source.src);
+                if (current == playList.lenght){
+                    source.src = playList[0];
+                } else {
+                    source.src = playList[current+1];
+                }
+                
+                player.load();
+                player.play();
+            }
         }
-    </script>
+
+        var socket = io.connect('http://localhost:8080');
+        socket.on('set', function (data) {
+            if (!$(playList).compare(data['list'])) {
+                playList = data['list'];
+                play();
+
+                console.log(data['list']);
+                console.log(playList);
+            }            
+        });
+        </script>
 </body>
 </html>
