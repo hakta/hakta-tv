@@ -1,63 +1,20 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Tv demo</title>
+    <title>Hydra</title>
     <meta name="description" content="">
-    <link rel="stylesheet" type="text/css" href="static/css/style.css">
-    <script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
-    <script src="static/js/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-1.6.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hydra.js') }}"></script>
 </head>
 <body>    
-    <video id="videoPlayer" class="player" width="100%" height="100%">
-        <source id="videoSource" src="" type="video/webm"/>
+    <video id="videoPlayer" class="player" width="100%" height="100%" controls>
+        <source id="videoSource" src="{{ url_for('media', filename='elephants_dream_640x360_2.30.webm') }}" type="video/webm"/>
     </video>
     <script type="text/javascript">
-        jQuery.fn.compare = function(t) {
-            if (this.length != t.length) { return false; }
-                var a = this.sort(),
-                b = t.sort();
-                for (var i = 0; t[i]; i++) {
-                if (a[i] !== b[i]) { 
-                    return false;
-                }
-            }
-            return true;
-        };
-
-        var playList;
-        
-        function play(){
-            player = $('#videoPlayer')[0];
-            source = $('#videoSource')[0];    
-
-            source.src = playList[0];
-            player.load();
-            player.play();
-
-            player.onended = function(){
-                console.log(source.src);
-                var current = playList.indexOf(source.src);
-                if (current == playList.lenght){
-                    source.src = playList[0];
-                } else {
-                    source.src = playList[current+1];
-                }
-                
-                player.load();
-                player.play();
-            }
-        }
-
-        var socket = io.connect('http://localhost:8080');
-        socket.on('set', function (data) {
-            if (!$(playList).compare(data['list'])) {
-                playList = data['list'];
-                play();
-
-                console.log(data['list']);
-                console.log(playList);
-            }            
-        });
-        </script>
+        main('{{ setup.server }}');
+    </script>
 </body>
 </html>
