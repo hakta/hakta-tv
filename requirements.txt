@@ -1,2 +1,1 @@
-Flask>=0.8
-gevent-socketio>=0.2.3
+django>=1.3

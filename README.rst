@@ -28,4 +28,4 @@ Run
 
 ::
     node app_socketio.js &
-    python app.py
+    cd hydra; python manage.py runserver 0.0.0.0:8000
