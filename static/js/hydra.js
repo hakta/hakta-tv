@@ -9,17 +9,17 @@ function set_current(path){
 }
 
 function first(){
-    set_current(playList[0])
+    set_current(playlist[0])
     $("video")[0].play();
 }
 
 function next(){
-    var index = playList.indexOf(current);
-    if (index == playList.length-1){ // end of play list?
-        path = playList[0];
+    var index = playlist.indexOf(current);
+    if (index == playlist.length-1){ // end of play list?
+        path = playlist[0];
     } else {
         // next video
-        path = playList[index+1];
+        path = playlist[index+1];
     }
 
     set_current(path);
@@ -28,53 +28,54 @@ function next(){
 
 function set(data){
     // dont net to update if is same play list
-    if (!$(playList).compare(data)) {
-        playList = data;
+    if (!$(playlist).compare(data)) {
+        playlist = data;
         first();
     }
 }
 
 function main(uri){
-    playList = null;
+    playlist = null;
     current = null;
 
-    var guid = store.get('guid');
-
-    if (guid == undefined){
-        $("#config").show();
-    }
-
-    $("#videoPlayer").bind('ended', function(){
+    $("#player").bind('ended', function(){
         // play next vido
         next();
     });
 
+    var guid = store.get('guid');
+    if (guid == undefined){
+        // show config form if there is no guid saved
+        $("#config").show();
+    }
+
     var socket = io.connect(uri);
     socket.on('connect', function () {
-        message("System", "connected!");
+        //message("System", "connected!");
         if (guid != undefined) {
             socket.emit("load", guid, function (data){
-            if (data != false){
-                $("#videoPlayer").show();
+            if (data){
                 set(data); // set play list
+                $("#player").show();
+                $("#status").hide();
             } else {
-                $("#messages").html("Waiting for a play list to " + guid);
-                message("Client", "no play list found!");
+                $("#status").html("Waiting for a play list to " + guid);
+                //message("Client", "no play list found!");
             }
         });    
         }        
     });
 
     socket.on('reconnect', function () {
-        message('System', 'Reconnected to the server');
+        //message('System', 'Reconnected to the server');
     });
 
     socket.on('reconnecting', function () {
-        message('System', 'Attempting to re-connect to the server');
+        //message('System', 'Attempting to re-connect to the server');
     });
 
     socket.on('error', function (e) {
-        message('System', e ? e : 'A unknown error occurred');
+        //message('System', e ? e : 'A unknown error occurred');
     });
 
     function message (from, msg) {
@@ -92,9 +93,11 @@ function main(uri){
         socket.emit("load", guid, function (data){
             if (data != false){
                 set(data); // set play list
+                $("#player").show();
+                $("#status").hide();
             } else {
-                $("#messages").html("Waiting for a play list to " + guid);
-                message("Client", "no play list found!");
+                $("#status").html("Waiting for a play list to " + guid);
+                //message("Client", "no play list found!");
             }
         });
         return false;

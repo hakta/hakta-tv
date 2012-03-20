@@ -20,6 +20,9 @@ var playlists = {
   '420c6daa-ce2b-afd8-64eb-378d8684b9b7': [
     "/static/media/sintel_640x360_2.28",
     "/static/media/elephants_dream_640x360_2.30"
+  ],
+  '27831633-0bed-1a37-720a-8bda42305990': [
+    "/static/media/sintel_640x360_2.28",
   ]
 };
 
